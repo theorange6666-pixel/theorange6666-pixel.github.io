@@ -1,26 +1,39 @@
-# Q版网页桌宠验收
+# 月色海风主题验收
 
-Scope: interactive chibi widget only. Homepage background redesign remains pending a suitable replacement image.
+Date: 2026-10-18
 
-Source visual: the user's standing Q版 reference, matched to the unchanged transparent 拉菲换装10 PNG linked in source/pet/README.txt.
-Rendered evidence: desktop 1440×1024 and mobile 390×844 browser screenshots, plus the isolated widget capture.
+## Scope and visual target
 
-## Findings
+The selected homepage concept supplies the lavender maritime palette, serif Chinese headline, left reading invitation, tilted right postcard, soft transition into latest articles, and Q版 companion. The right postcard is intentionally an environment-only rose conservatory image, as explained before implementation. The companion uses the original transparent sprite linked in source/pet/README.txt.
 
-No P0/P1/P2 issues remain in the widget.
+The original environment assets and desktop/mobile rendered captures were opened and visually compared. The character panel from the original concept is not reproduced.
 
-- Typography: system Chinese font at 13px (12px mobile speech), readable controls and correctly wrapped greeting.
-- Layout: character retains its source aspect ratio. Toolbar and speech remain inside both tested viewports. Drag bounds prevent inaccessible controls; reset restores the corner position.
-- Colors: muted gray-purple controls and translucent ivory speech background distinguish the widget from the page.
-- Asset fidelity: exact source sprite with original hair, standing pose, outfit and rigging. Alpha background preserved; no generated replacement in the shipped assets.
-- Content: short original greetings, clearly labeled interaction/sleep/reset/collapse controls. The PNG is static; CSS supplies bobbing and hop movement. No skeletal/Live2D animation is claimed.
+## Findings and corrections
 
-## Verified behavior
+- Resolved P2: initial backdrop saturation weakened header and small-text contrast. Reduced backdrop opacity and darkened foreground text and the primary button; recaptured desktop and mobile.
+- Resolved P2: an expanded companion obscured part of the first mobile reading area. First mobile visits now begin with a compact summon button. Users can open, drag, collapse and remember their choice.
+- Resolved P2: old companion CSS could stretch the restore button when theme placement changed sides. Increased placement selector specificity and verified its compact width.
+- No P0/P1/P2 issues remain in the verified theme and companion scope.
 
-Browser checks passed for image loading, greeting and hop, sleep/wake, pointer dragging, saved position after reload, collapse/restore, reset, mobile bounds, absence of horizontal overflow, reduced-motion preference and absence of widget JavaScript errors.
+## Required visual surfaces
+
+- Typography: Chinese serif headlines, italic English signature, 16px article text and 14px previews. Wrapping and title bounds checked at 320, 390, 768, 1024, 1440 and 1920px widths. Brand and navigation remain separated.
+- Layout: two-column desktop hero and horizontal article preview; stacked mobile hero, postcard and article. Margins, crop, card padding and reading column visually inspected. No horizontal overflow.
+- Colors: lavender ink, pale ivory article surfaces, lightened dusk backdrop and darker muted metadata. A mask blends the real environment image into the page without an abrupt boundary.
+- Assets: two original environment illustrations retain their aspect ratios with intentional crops. The Q版 sprite is the original file; no generated replacement or placeholder asset is shipped.
+- Copy: actual Hexo title, date, excerpt and tags. Article, tag and archive pages are generated from content. No invented posts; descriptive navigation and control labels.
+
+## Browser evidence and behavior
+
+Captured screenshots: moonsea-desktop.png, moonsea-desktop-viewport.png, moonsea-mobile.png, moonsea-post.png, moonsea-archive.png, moonsea-mobile-post.png, moonsea-mobile-pet.png.
+
+Checks passed: image loading; responsive header/layout at six widths; primary read link and keyboard focus; post, tag, archive and home navigation; desktop pet; mobile initial collapse, summon and interaction; reduced-motion preference; no theme/companion script errors or missing assets.
+
+Pet regression: greeting/hop, sleep/wake, dragging, position persistence, collapse/restore, reset, mobile bounds and reduced motion.
 
 ## Follow-up polish
 
-P3: higher-resolution source sprites or an explicitly supplied animation set could improve sharpness and add eye/limb articulation.
+P3: the editable wordmark uses an italic system serif rather than handwritten lettering. The companion retains the low-resolution game sprite; its animation is whole-sprite bobbing and hop, not Live2D or articulated limbs.
 
 final result: passed
+

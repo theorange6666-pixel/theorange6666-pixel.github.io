@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eeedf9">
+  <% const currentTitle = is_home() ? config.title : ((page.title || (page.tag ? '标签：' + page.tag : '文章归档')) + ' | ' + config.title); %>
+  <title><%= currentTitle %></title>
+  <meta name="description" content="<%= page.description || config.description %>">
+  <link rel="canonical" href="<%= url %>">
+  <link rel="stylesheet" href="<%- url_for('css/moonsea.css') %>">
+</head>
+<body class="<%= is_home() ? 'page-home' : 'page-inner' %>">
+  <a class="skip-link" href="#main-content">跳至正文</a>
+  <div class="site-scene" aria-hidden="true"></div>
+  <header class="site-header shell">
+    <a class="brand" href="<%- url_for('/') %>" aria-label="<%= config.title %>，返回首页">
+      <span class="brand-name"><%= config.author %></span>
+      <span class="brand-caption">的 博 客</span>
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+      <a href="<%- url_for('/') %>" <%- is_home() ? 'aria-current="page"' : '' %>>首页</a>
+      <a href="<%- url_for('/archives/') %>" <%- is_archive() ? 'aria-current="page"' : '' %>>归档</a>
+    </nav>
+  </header>
+  <main id="main-content"><%- body %></main>
+  <footer class="site-footer shell">
+    <a href="<%- url_for('/') %>">月色常在，日常可爱。</a>
+    <p>© <%= new Date().getFullYear() %> <%= config.author %> <span>·</span> <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a></p>
+  </footer>
+  <script src="<%- url_for('js/moonsea.js') %>" defer></script>
+</body>
+</html>

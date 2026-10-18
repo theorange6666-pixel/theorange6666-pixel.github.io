@@ -1,0 +1,14 @@
+<article class="reading-shell post-page">
+  <header class="reading-header">
+    <a class="breadcrumb" href="<%- url_for('/') %>">首页</a><span class="breadcrumb-separator" aria-hidden="true"> / </span><a class="breadcrumb" href="<%- url_for('/archives/') %>">文章</a>
+    <h1><%= page.title || '未命名文章' %></h1>
+    <p class="post-meta"><time datetime="<%= date_xml(page.date) %>"><%= date(page.date, 'YYYY年MM月DD日') %></time><span><%= config.author %></span></p>
+  </header>
+  <div class="post-content"><%- page.content %></div>
+  <% if (page.tags && page.tags.length) { %><nav class="post-tags" aria-label="文章标签"><% page.tags.each(function(tag) { %><a href="<%- url_for(tag.path) %>"><%= tag.name %></a><% }); %></nav><% } %>
+  <nav class="post-navigation" aria-label="继续阅读">
+    <% if (page.prev) { %><a href="<%- url_for(page.prev.path) %>">上一篇：<%= page.prev.title %></a><% } %>
+    <% if (page.next) { %><a href="<%- url_for(page.next.path) %>">下一篇：<%= page.next.title %></a><% } %>
+    <a href="<%- url_for('/archives/') %>">浏览文章归档 <span aria-hidden="true">→</span></a>
+  </nav>
+</article>

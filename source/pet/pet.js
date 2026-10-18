@@ -62,7 +62,7 @@
     saved.hidden = hidden; persist();
   }
   setSleep(sleeping);
-  hidePet(Boolean(saved.hidden));
+  hidePet(typeof saved.hidden === 'boolean' ? saved.hidden : matchMedia('(max-width: 600px)').matches);
   if (Number.isFinite(saved.x) && Number.isFinite(saved.y) && !pet.hidden) setPosition(saved.x, saved.y);
   character.addEventListener('click', event => {
     if (event.detail === 0) react();

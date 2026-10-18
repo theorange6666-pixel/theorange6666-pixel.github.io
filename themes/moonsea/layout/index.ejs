@@ -1,0 +1,41 @@
+<section class="hero shell" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <p class="hero-signature" lang="en"><%= theme.hero_signature %></p>
+    <h1 id="hero-title"><%= theme.hero_title %></h1>
+    <p class="hero-description"><%= theme.hero_description %></p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="#latest">开始阅读 <span aria-hidden="true">→</span></a>
+      <a class="button button-quiet" href="<%- url_for('/archives/') %>">文章归档</a>
+    </div>
+    <p class="hero-note">把喜欢的瞬间，慢慢写成故事。</p>
+  </div>
+  <figure class="hero-postcard">
+    <img src="<%- url_for('images/rose-postcard.png') %>" alt="白玫瑰与暖灯围绕的海边窗台，远处是淡紫色暮海" width="800" height="1000" fetchpriority="high">
+    <figcaption><span>a quiet moment</span><span class="postcard-signature">Laffey</span></figcaption>
+  </figure>
+</section>
+
+<section class="latest shell" id="latest" aria-labelledby="latest-title">
+  <header class="section-heading">
+    <p class="section-kicker" lang="en">LATEST ARTICLES</p>
+    <h2 id="latest-title">最新文章</h2>
+    <p>收藏日常里的小小闪光。</p>
+  </header>
+  <div class="post-list">
+    <% page.posts.each(function(post) { %>
+      <article class="post-preview">
+        <a class="post-preview-art" href="<%- url_for(post.path) %>" tabindex="-1" aria-hidden="true">
+          <img src="<%- url_for('images/rose-postcard.png') %>" alt="" width="800" height="1000" loading="lazy">
+        </a>
+        <div class="post-preview-copy">
+          <div class="post-meta"><time datetime="<%= date_xml(post.date) %>"><%= date(post.date, 'YYYY.MM.DD') %></time><% if (post.tags && post.tags.length) { %><span><%= post.tags.map(function(tag) { return tag.name; }).join(' · ') %></span><% } %></div>
+          <h3><a href="<%- url_for(post.path) %>"><%= post.title || '未命名文章' %></a></h3>
+          <p class="post-summary"><%= truncate(strip_html(post.excerpt || post.content), { length: 110, omission: '…' }) %></p>
+          <a class="read-link" href="<%- url_for(post.path) %>">阅读全文 <span aria-hidden="true">→</span></a>
+        </div>
+      </article>
+    <% }); %>
+  </div>
+  <% if (page.total > 1) { %><nav class="pagination" aria-label="文章分页"><%- paginator({ prev_text: '上一页', next_text: '下一页' }) %></nav><% } %>
+  <a class="all-posts" href="<%- url_for('/archives/') %>">查看文章归档 <span aria-hidden="true">→</span></a>
+</section>

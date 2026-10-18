@@ -1,0 +1,15 @@
+<section class="reading-shell archive-page">
+  <header class="reading-header">
+    <p class="section-kicker" lang="en">COLLECTED MOMENTS</p>
+    <h1><%= page.tag ? '标签：' + page.tag : (page.category ? '分类：' + page.category : '文章归档') %></h1>
+    <p>那些被写下来的日常，都留在这里。</p>
+  </header>
+  <div class="archive-list">
+    <% let previousYear = null; page.posts.sort('date', -1).each(function(post) { const year = date(post.date, 'YYYY'); %>
+      <% if (year !== previousYear) { previousYear = year; %><h2 class="archive-year"><%= year %></h2><% } %>
+      <a class="archive-entry" href="<%- url_for(post.path) %>"><time datetime="<%= date_xml(post.date) %>"><%= date(post.date, 'MM.DD') %></time><span><%= post.title || '未命名文章' %></span><span aria-hidden="true">→</span></a>
+    <% }); %>
+  </div>
+  <% if (page.total > 1) { %><nav class="pagination" aria-label="归档分页"><%- paginator({ prev_text: '上一页', next_text: '下一页' }) %></nav><% } %>
+  <a class="read-link back-home" href="<%- url_for('/') %>">返回首页 <span aria-hidden="true">→</span></a>
+</section>
