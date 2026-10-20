@@ -7,6 +7,7 @@
   const resetLoveKeys = () => { loveKeys = ''; };
   function showHearts() {
     if (heartLayer) return;
+    document.dispatchEvent(new Event('companion:love'));
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const layer = document.createElement('div');
     layer.className = 'love-hearts';

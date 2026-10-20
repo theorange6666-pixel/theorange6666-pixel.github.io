@@ -1,0 +1,9 @@
+# 小狗素材与生成记录
+
+日期：2026-10-21。使用内置 imagegen 工具，按用户在聊天中提供的两只直立小狗参考图生成；不是官方原始动画，也没有复制第三方 GitHub 仓库的表情包素材。
+
+最终图片：`source/pet/dogs-sprites.png`，1536 × 1024 RGBA，透明背景。3 列 × 2 行，单格 512 × 512。上排小白，下排小金毛；每排依次为站立、迈步、闭眼休息。前进、轻跳、靠近和贴贴由网页控制，不是骨骼动画。
+
+生成提示词：
+
+> Edit / character extraction and faithful pose sheet for browser pet sprites. Use ONLY this provided drawing as the exact character source. Preserve its recognizable Maltese / Line Puppy identity with maximum fidelity. NO creative redesign: same tiny circular eyes, tiny broad horizontal moustache-shaped curved mouth and black nose, same very squat bipedal upright silhouettes, thick imperfect black marker line. Tan dog: beige fill #e7d0a1, large smooth drooping ears framing oval head, thin coral red collar, little arms and very short stubby legs, three little tail strokes. White dog: distinct tall rectangular fluffy biped silhouette, broken/dashed black contour with round fluffy ear bumps and little side tail, pure white body fill (NOT transparent body). No blush, no extra head tuft, no highlights, no shadows, no soft glow. Produce an EXACT 3-column by 2-row transparent sprite atlas, 1536x1024, six 512x512 equal cells, no labels/grid/background. Row1 white dog only, Row2 tan dog only. Col1 faithful front-facing full standing pose as in reference, reconstructed only where occluded; Col2 same dog lifting one tiny arm and one stubby foot to step; Col3 dog asleep sitting/curled with closed eyes, maintaining exact face and contour style. Each character fully isolated with clear separation, center of each cell, 64px safe padding, consistent scale and baseline. Each cell contains ONE dog, never both together. The reference drawing's flat simplicity and proportions must be followed, NOT four-legged realistic dog anatomy and NOT cute generic furry puppy redesign.

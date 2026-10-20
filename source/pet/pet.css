@@ -1,21 +1,45 @@
-.laffey-pet { position: fixed; right: 18px; bottom: 20px; width: 208px; height: 270px; z-index: 2000; color: #3e3d54; font: 13px/1.5 system-ui, 'Microsoft YaHei', sans-serif; }
-.laffey-pet *, .laffey-restore { box-sizing: border-box; }
-.laffey-pet[hidden], .laffey-restore[hidden] { display: none !important; }
-.laffey-speech { position: absolute; top: 0; left: 0; width: 100%; min-height: 52px; padding: 10px 12px; border: 1px solid #d8d6e3; border-radius: 14px; background: #fffffff2; box-shadow: 0 3px 15px #36344912; opacity: 0; transform: translateY(5px); transition: opacity .2s, transform .2s; pointer-events: none; }
-.laffey-speech.is-visible { opacity: 1; transform: translateY(0); }
-.laffey-character { position: absolute; bottom: 44px; left: 10px; width: 188px; height: 170px; padding: 0; border: 0; background: none; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
-.laffey-character img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 5px 4px #23243325); animation: laffey-breathe 4s ease-in-out infinite; transform-origin: 50% 90%; }
-.laffey-character:hover img { filter: drop-shadow(0 5px 7px #79739845); }
-.laffey-pet.is-dragging .laffey-character { cursor: grabbing; }
-.laffey-pet.is-dragging img { animation: none; transform: rotate(-5deg); }
-.laffey-pet.is-reacting img { animation: laffey-hop .65s ease-in-out; }
-.laffey-pet.is-sleeping img { animation: laffey-breathe 7s ease-in-out infinite; filter: drop-shadow(0 5px 4px #23243325) saturate(.65); }
-.laffey-actions { position: absolute; bottom: 0; display: flex; gap: 2px; width: 100%; padding: 2px; border: 1px solid #dfdce8; border-radius: 12px; background: #fffffff2; box-shadow: 0 3px 12px #3634490d; }
-.laffey-actions button { flex: 1; min-width: 0; min-height: 40px; padding: 0 3px; border: 0; border-radius: 8px; background: transparent; color: #514c69; font: inherit; cursor: pointer; }
-.laffey-actions button:hover { background: #eeedf5; }
-.laffey-pet button:focus-visible, .laffey-restore:focus-visible { outline: 3px solid #9187b8; outline-offset: 3px; }
-.laffey-restore { position: fixed; right: 18px; bottom: 20px; z-index: 2000; min-height: 44px; padding: 9px 15px; border: 1px solid #d8d6e3; border-radius: 22px; background: #fffffff2; color: #514c69; font: 13px/1.5 system-ui, 'Microsoft YaHei', sans-serif; cursor: pointer; box-shadow: 0 3px 12px #36344912; }
-@keyframes laffey-breathe { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-5px) rotate(1deg); } }
-@keyframes laffey-hop { 0%,100% { transform: translateY(0) rotate(0); } 35% { transform: translateY(-18px) rotate(-5deg); } 70% { transform: translateY(-3px) rotate(3deg); } }
-@media (max-width: 600px) { .laffey-pet { width: 172px; height: 240px; right: 10px; bottom: 12px; } .laffey-character { width: 152px; height: 145px; } .laffey-restore { right: 10px; bottom: 12px; } .laffey-speech { font-size: 12px; } }
-@media (prefers-reduced-motion: reduce) { .laffey-pet img { animation: none !important; transform: none !important; } .laffey-speech { transition: none; } }
+.companion-stage { position: fixed; inset: 0; z-index: 2000; pointer-events: none; }
+.companion-stage[hidden], .companion-controls [hidden], .companion-pair-heart[hidden] { display: none !important; }
+.companion-pet { position: absolute; width: 136px; height: 136px; padding: 0; background: none; border: 0; cursor: grab; pointer-events: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.companion-facing, .companion-art { display: block; width: 100%; height: 100%; }
+.companion-facing { transform: scaleX(var(--facing, 1)); }
+.companion-art { background-image: url('dogs-sprites.png'); background-size: 300% 200%; background-position: 0 var(--sprite-row, 0%); background-repeat: no-repeat; transform-origin: 50% 88%; }
+.is-golden { --sprite-row: 100%; }
+.is-laffey .companion-art { background-size: contain; background-position: center; }
+.companion-pet[data-action="idle"] .companion-art { animation: companion-breathe 4s ease-in-out infinite; }
+.companion-pet[data-action="walk"] .companion-art { animation: companion-step .42s steps(1) infinite, companion-bob .42s ease-in-out infinite; }
+.companion-pet[data-action="sleep"] .companion-art { background-position: 100% var(--sprite-row, 0%); animation: companion-breathe 6s ease-in-out infinite; }
+.is-laffey[data-action="sleep"] .companion-art { background-position: center; filter: saturate(.65); }
+.companion-pet[data-action="happy"] .companion-art { background-position: 50% var(--sprite-row, 0%); animation: companion-hop .7s ease-in-out; }
+.is-laffey[data-action="happy"] .companion-art { background-position: center; }
+.companion-pet[data-action="cuddle"] .companion-art { animation: companion-cuddle 1.3s ease-in-out 2; }
+.companion-pet.is-dragging { cursor: grabbing; }
+.companion-pet.is-dragging .companion-art { animation: none; transform: rotate(-8deg); }
+.companion-zzz { display: none; position: absolute; top: 0; right: 5px; color: #546958; font: 600 16px/1.5 Georgia, serif; letter-spacing: 3px; }
+[data-action="sleep"] .companion-zzz { display: block; }
+.companion-pair-heart { position: absolute; width: 44px; height: 44px; background: url('../images/love-heart.svg') center / contain no-repeat; animation: companion-heart 1.3s ease-in-out 2; }
+.companion-controls { position: fixed; right: 18px; bottom: 18px; z-index: 2100; width: min(260px, calc(100vw - 24px)); display: flex; justify-content: flex-end; color: #294639; font: 13px/1.6 'Microsoft YaHei', system-ui, sans-serif; }
+.companion-controls *, .companion-speech { box-sizing: border-box; }
+.companion-controls { pointer-events: none; }
+.companion-controls > * { pointer-events: auto; }
+.companion-controls button, .companion-controls select { font: inherit; color: inherit; }
+.companion-toggle, .companion-restore { min-height: 42px; padding: 9px 17px; border: 1px solid #d9e2cf; border-radius: 24px; background: #fffdf6f5; cursor: pointer; box-shadow: 0 3px 14px #2946390d; }
+.companion-toggle:hover, .companion-restore:hover { background: #ffd4da; }
+.companion-menu { position: absolute; bottom: 52px; right: 0; width: 100%; padding: 16px; background: #fffdf6; border: 1px solid #d9e2cf; border-radius: 18px; box-shadow: 0 8px 30px #2946391a; }
+.companion-menu label { display: block; font-size: 12px; }
+.companion-menu select { display: block; width: 100%; min-height: 40px; margin-top: 6px; padding: 6px 10px; border: 1px solid #d9e2cf; border-radius: 9px; background: #fff; }
+.companion-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 12px; }
+.companion-actions button { min-height: 40px; padding: 4px 3px; border: 1px solid #d9e2cf; border-radius: 9px; background: #f0f5e8; cursor: pointer; }
+.companion-actions button:hover { background: #ffd4da; }
+.companion-menu p { margin: 10px 0 0; font-size: 10px; text-align: center; color: #546958; }
+.companion-speech { position: fixed; right: 20px; bottom: 222px; z-index: 2101; max-width: min(240px, calc(100vw - 40px)); padding: 10px 14px; border: 1px solid #d9e2cf; border-radius: 14px; background: #fffdf6f5; color: #294639; font: 12px/1.7 'Microsoft YaHei', system-ui, sans-serif; opacity: 0; pointer-events: none; transition: opacity .18s; }
+.companion-speech.is-visible { opacity: 1; }
+.companion-pet:focus-visible, .companion-controls button:focus-visible, .companion-controls select:focus-visible { outline: 3px solid #426b4c; outline-offset: 4px; border-radius: 12px; }
+@keyframes companion-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes companion-step { 0%, 100% { background-position: 0 var(--sprite-row, 0%); } 50% { background-position: 50% var(--sprite-row, 0%); } }
+@keyframes companion-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+@keyframes companion-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px) rotate(-5deg); } 70% { transform: translateY(-3px) rotate(3deg); } }
+@keyframes companion-cuddle { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(7deg) translateX(3px); } }
+@keyframes companion-heart { 0%, 100% { transform: scale(.85); } 50% { transform: scale(1.1) translateY(-4px); } }
+@media (max-width: 600px) { .companion-pet { width: 108px; height: 108px; } .companion-controls { right: 12px; bottom: 12px; } .companion-speech { bottom: 194px; right: 14px; } }
+@media (prefers-reduced-motion: reduce) { .companion-art, .companion-pair-heart { animation: none !important; transform: none !important; } .companion-speech { transition: none; } }
