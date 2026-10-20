@@ -1,5 +1,8 @@
 .companion-stage { position: fixed; inset: 0; z-index: 2000; pointer-events: none; }
-.companion-stage[hidden], .companion-controls [hidden], .companion-pair-heart[hidden] { display: none !important; }
+.companion-stage[hidden], .companion-controls [hidden], .companion-pair-heart[hidden], .companion-sleep-pair[hidden] { display: none !important; }
+.companion-sleep-pair { position: absolute; background: url('dogs-sleep-pair.png') center / contain no-repeat; pointer-events: none; animation: companion-breathe 6s ease-in-out infinite; }
+.is-pair-sleep .companion-pet .companion-art { visibility: hidden; }
+.is-pair-sleep .is-white .companion-zzz { display: none; }
 .companion-pet { position: absolute; width: 136px; height: 136px; padding: 0; background: none; border: 0; cursor: grab; pointer-events: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
 .companion-facing, .companion-art { display: block; width: 100%; height: 100%; }
 .companion-facing { transform: scaleX(var(--facing, 1)); }
@@ -42,4 +45,4 @@
 @keyframes companion-cuddle { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(7deg) translateX(3px); } }
 @keyframes companion-heart { 0%, 100% { transform: scale(.85); } 50% { transform: scale(1.1) translateY(-4px); } }
 @media (max-width: 600px) { .companion-pet { width: 108px; height: 108px; } .companion-controls { right: 12px; bottom: 12px; } .companion-speech { bottom: 194px; right: 14px; } }
-@media (prefers-reduced-motion: reduce) { .companion-art, .companion-pair-heart { animation: none !important; transform: none !important; } .companion-speech { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .companion-art, .companion-pair-heart, .companion-sleep-pair { animation: none !important; transform: none !important; } .companion-speech { transition: none; } }

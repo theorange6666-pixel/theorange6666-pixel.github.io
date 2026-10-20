@@ -26,6 +26,11 @@
   pairHeart.setAttribute('aria-hidden', 'true');
   pairHeart.hidden = true;
   stage.append(pairHeart);
+  const sleepPair = document.createElement('span');
+  sleepPair.className = 'companion-sleep-pair';
+  sleepPair.setAttribute('aria-hidden', 'true');
+  sleepPair.hidden = true;
+  stage.append(sleepPair);
   document.body.append(stage, speech, ui);
   const toggle = ui.querySelector('.companion-toggle');
   const restore = ui.querySelector('.companion-restore');
@@ -100,11 +105,24 @@
     restore.hidden = !hidden;
     persist();
   }
+  function updateSleepPair() {
+    const paired = saved.mode === 'dogs' && sleeping() && pets.length === 2;
+    stage.classList.toggle('is-pair-sleep', paired);
+    sleepPair.hidden = !paired;
+    if (!paired) return;
+    const s = size(), width = s * 1.9, height = s * 1.25;
+    const center = (pets[0].x + pets[1].x) / 2 + s / 2;
+    sleepPair.style.width = `${width}px`;
+    sleepPair.style.height = `${height}px`;
+    sleepPair.style.left = `${Math.max(4, Math.min(innerWidth - width - 4, center - width / 2))}px`;
+    sleepPair.style.top = `${Math.max(4, Math.min(innerHeight - height - 62, Math.min(pets[0].y, pets[1].y) - s * .25))}px`;
+  }
   function setSleeping(value) {
     saved.sleeping[saved.mode] = value;
     pets.forEach(p => { p.goal = null; pose(p, value ? 'sleep' : 'idle'); });
     sleepButton.textContent = value ? '唤醒' : '休息';
     sleepButton.setAttribute('aria-pressed', String(value));
+    updateSleepPair();
     persist();
   }
   function showPairHeart() {
@@ -118,7 +136,7 @@
     meeting = null;
     if (reason === 'sleep') {
       setSleeping(true);
-      say('靠在一起，睡个好觉。');
+      say('小白枕着小黄，睡个好觉。');
     } else if (reason) {
       pets.forEach(p => pose(p, 'cuddle'));
       showPairHeart();
@@ -198,6 +216,7 @@
     });
     p.el.addEventListener('pointerdown', event => {
       if (!event.isPrimary || event.button !== 0) return;
+      if (saved.mode === 'dogs' && sleeping()) setSleeping(false);
       clearMeeting(); cancelDrag();
       cancelAnimationFrame(frame); frame = 0;
       drag = { p, id: event.pointerId, x: event.clientX, y: event.clientY, left: p.x, top: p.y, moved: false };
@@ -225,6 +244,7 @@
     p.el.addEventListener('keydown', event => {
       const directions = { ArrowLeft: [-16, 0], ArrowRight: [16, 0], ArrowUp: [0, -16], ArrowDown: [0, 16] };
       if (!directions[event.key]) return;
+      if (saved.mode === 'dogs' && sleeping()) setSleeping(false);
       event.preventDefault(); clearMeeting();
       position(p, p.x + directions[event.key][0], p.y + directions[event.key][1]); remember();
     });
@@ -286,6 +306,7 @@
   addEventListener('resize', () => {
     cancelDrag(); clearMeeting();
     pets.forEach(p => { position(p, p.x, p.y); pose(p, sleeping() ? 'sleep' : 'idle'); }); remember();
+    updateSleepPair();
   });
   reduced.addEventListener('change', () => {
     if (reduced.matches) { cancelAnimationFrame(frame); frame = 0; pets.forEach(p => { if (p.goal) { position(p, p.goal.x, p.goal.y); p.goal = null; pose(p, 'idle'); } }); if (meeting) finishMeeting(); }
