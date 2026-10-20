@@ -13,12 +13,12 @@
 .is-laffey .companion-art { background-size: contain; background-position: center; }
 .companion-pet[data-action="idle"] .companion-art { animation: companion-breathe 4s ease-in-out infinite; }
 .companion-pet[data-action="walk"] .companion-art { animation: companion-step .42s steps(1) infinite, companion-bob .42s ease-in-out infinite; }
-.companion-pet[data-action="sleep"] .companion-art { background-position: 100% var(--sprite-row, 0%); animation: companion-breathe 6s ease-in-out infinite; }
+.companion-pet[data-action="sleep"] .companion-art { background-position: 0 var(--sprite-row, 0%); animation: companion-breathe 6s ease-in-out infinite; }
 .is-laffey[data-action="sleep"] .companion-art { background-position: center; filter: saturate(.65); }
 .companion-pet[data-action="happy"] .companion-art { background-position: 50% var(--sprite-row, 0%); animation: companion-hop .7s ease-in-out; }
 .is-laffey[data-action="happy"] .companion-art { background-position: center; }
 .companion-pet[data-action="cuddle"] .companion-art { animation: companion-breathe 4s ease-in-out infinite; }
-.companion-pet[data-action="settle"] .companion-art { background-position: 100% var(--sprite-row, 0%); }
+.companion-pet[data-action="settle"] .companion-art { background-position: 0 var(--sprite-row, 0%); }
 .companion-pet[data-action="waking"] .companion-art { animation: companion-stretch .7s ease-in-out; }
 .companion-pet.is-dragging { cursor: grabbing; }
 .companion-pet.is-dragging .companion-art { animation: none; transform: rotate(-8deg); }
