@@ -1,12 +1,14 @@
 .companion-stage { position: fixed; inset: 0; z-index: 2000; pointer-events: none; }
 .companion-stage[hidden], .companion-controls [hidden], .companion-pair-heart[hidden], .companion-sleep-pair[hidden] { display: none !important; }
-.companion-sleep-pair { position: absolute; background: url('dogs-sleep-pair-v2.png') center / contain no-repeat; pointer-events: none; animation: companion-breathe 6s ease-in-out infinite; }
-.is-pair-sleep .companion-pet .companion-art { visibility: hidden; }
+.companion-sleep-pair { position: absolute; pointer-events: none; transform-origin: 50% 85%; }
+.companion-sleep-art { display: block; width: 100%; height: 100%; background: url('dogs-sleep-pair-v2.png') center / contain no-repeat; animation: companion-breathe 6s ease-in-out infinite; }
+.is-pair-sleep .companion-pet .companion-art { opacity: 0; }
 .is-pair-sleep .is-white .companion-zzz { display: none; }
 .companion-pet { position: absolute; width: 136px; height: 136px; padding: 0; background: none; border: 0; cursor: grab; pointer-events: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
-.companion-facing, .companion-art { display: block; width: 100%; height: 100%; }
-.companion-facing { transform: scaleX(var(--facing, 1)); }
-.companion-art { background-image: url('dogs-sprites.png'); background-size: 300% 200%; background-position: 0 var(--sprite-row, 0%); background-repeat: no-repeat; transform-origin: 50% 88%; }
+.companion-gesture, .companion-facing, .companion-art { display: block; width: 100%; height: 100%; }
+.companion-gesture { transform-origin: 50% 85%; }
+.companion-facing { transform: scaleX(var(--facing, 1)); transition: transform .32s ease-in-out; }
+.companion-art { background-image: url('dogs-sprites.png'); background-size: 300% 200%; background-position: 0 var(--sprite-row, 0%); background-repeat: no-repeat; transform-origin: 50% 88%; transition: opacity .55s ease-in-out; }
 .is-golden { --sprite-row: 100%; }
 .is-laffey .companion-art { background-size: contain; background-position: center; }
 .companion-pet[data-action="idle"] .companion-art { animation: companion-breathe 4s ease-in-out infinite; }
@@ -15,12 +17,14 @@
 .is-laffey[data-action="sleep"] .companion-art { background-position: center; filter: saturate(.65); }
 .companion-pet[data-action="happy"] .companion-art { background-position: 50% var(--sprite-row, 0%); animation: companion-hop .7s ease-in-out; }
 .is-laffey[data-action="happy"] .companion-art { background-position: center; }
-.companion-pet[data-action="cuddle"] .companion-art { animation: companion-cuddle 1.3s ease-in-out 2; }
+.companion-pet[data-action="cuddle"] .companion-art { animation: companion-breathe 4s ease-in-out infinite; }
+.companion-pet[data-action="settle"] .companion-art { background-position: 100% var(--sprite-row, 0%); }
+.companion-pet[data-action="waking"] .companion-art { animation: companion-stretch .7s ease-in-out; }
 .companion-pet.is-dragging { cursor: grabbing; }
 .companion-pet.is-dragging .companion-art { animation: none; transform: rotate(-8deg); }
 .companion-zzz { display: none; position: absolute; top: 0; right: 5px; color: #546958; font: 600 16px/1.5 Georgia, serif; letter-spacing: 3px; }
 [data-action="sleep"] .companion-zzz { display: block; }
-.companion-pair-heart { position: absolute; width: 44px; height: 44px; background: url('../images/love-heart.svg') center / contain no-repeat; animation: companion-heart 1.3s ease-in-out 2; }
+.companion-pair-heart { position: absolute; width: 44px; height: 44px; background: url('../images/love-heart.svg') center / contain no-repeat; }
 .companion-controls { position: fixed; right: 18px; bottom: 18px; z-index: 2100; width: min(260px, calc(100vw - 24px)); display: flex; justify-content: flex-end; color: #294639; font: 13px/1.6 'Microsoft YaHei', system-ui, sans-serif; }
 .companion-controls *, .companion-speech { box-sizing: border-box; }
 .companion-controls { pointer-events: none; }
@@ -42,7 +46,6 @@
 @keyframes companion-step { 0%, 100% { background-position: 0 var(--sprite-row, 0%); } 50% { background-position: 50% var(--sprite-row, 0%); } }
 @keyframes companion-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
 @keyframes companion-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px) rotate(-5deg); } 70% { transform: translateY(-3px) rotate(3deg); } }
-@keyframes companion-cuddle { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(7deg) translateX(3px); } }
-@keyframes companion-heart { 0%, 100% { transform: scale(.85); } 50% { transform: scale(1.1) translateY(-4px); } }
+@keyframes companion-stretch { 0% { transform: translateY(6px) scale(.96); } 55% { transform: translateY(-3px) scale(1.02); } 100% { transform: translateY(0) scale(1); } }
 @media (max-width: 600px) { .companion-pet { width: 108px; height: 108px; } .companion-controls { right: 12px; bottom: 12px; } .companion-speech { bottom: 194px; right: 14px; } }
-@media (prefers-reduced-motion: reduce) { .companion-art, .companion-pair-heart, .companion-sleep-pair { animation: none !important; transform: none !important; } .companion-speech { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .companion-art, .companion-pair-heart, .companion-sleep-art { animation: none !important; transform: none !important; } .companion-facing, .companion-art, .companion-speech { transition: none; } }

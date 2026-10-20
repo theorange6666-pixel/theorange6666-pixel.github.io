@@ -29,6 +29,7 @@
   const sleepPair = document.createElement('span');
   sleepPair.className = 'companion-sleep-pair';
   sleepPair.setAttribute('aria-hidden', 'true');
+  sleepPair.innerHTML = '<span class="companion-sleep-art"></span>';
   sleepPair.hidden = true;
   stage.append(sleepPair);
   document.body.append(stage, speech, ui);
@@ -46,6 +47,10 @@
   let session = 0;
   let speechTimer;
   let cuddleTimer;
+  let heartTimer;
+  let sleepFadeTimer;
+  let sleepAnimation;
+  let gesture = 0;
   const size = () => innerWidth <= 600 ? 108 : 136;
   const persist = () => { try { localStorage.setItem(key, JSON.stringify(saved)); } catch (_) {} };
   const sleeping = () => Boolean(saved.sleeping[saved.mode]);
@@ -81,10 +86,18 @@
     toggle.setAttribute('aria-expanded', 'false');
   }
   function clearMeeting() {
+    gesture++;
     meeting = null;
     pairHeart.hidden = true;
+    pairHeart.getAnimations().forEach(animation => animation.cancel());
     clearTimeout(cuddleTimer);
-    pets.forEach(p => { p.goal = null; pose(p, sleeping() ? 'sleep' : 'idle'); });
+    clearTimeout(heartTimer);
+    pets.forEach(p => {
+      p.goal = null;
+      p.gestureAnimation?.cancel();
+      pose(p, sleeping() ? 'sleep' : 'idle');
+    });
+    stage.dataset.phase = sleeping() ? 'sleeping' : 'idle';
   }
   function cancelDrag() {
     if (!drag) return;
@@ -105,48 +118,120 @@
     restore.hidden = !hidden;
     persist();
   }
-  function updateSleepPair() {
+  function updateSleepPair(transition = false) {
     const paired = saved.mode === 'dogs' && sleeping() && pets.length === 2;
+    const wasPaired = stage.classList.contains('is-pair-sleep');
+    clearTimeout(sleepFadeTimer);
+    sleepAnimation?.cancel();
     stage.classList.toggle('is-pair-sleep', paired);
-    sleepPair.hidden = !paired;
-    if (!paired) return;
+    if (!paired) {
+      if (wasPaired && transition && !reduced.matches && !saved.hidden) {
+        sleepAnimation = sleepPair.animate([
+          { opacity: 1, transform: 'translateY(0) scale(1)' },
+          { opacity: 0, transform: 'translateY(-5px) scale(.97)' }
+        ], { duration: 560, easing: 'cubic-bezier(.25,.1,.25,1)' });
+        sleepFadeTimer = setTimeout(() => { sleepPair.hidden = true; }, 560);
+      } else sleepPair.hidden = true;
+      return;
+    }
+    sleepPair.hidden = false;
     const s = size(), width = s * 1.9, height = s * 1.25;
     const center = (pets[0].x + pets[1].x) / 2 + s / 2;
     sleepPair.style.width = `${width}px`;
     sleepPair.style.height = `${height}px`;
     sleepPair.style.left = `${Math.max(4, Math.min(innerWidth - width - 4, center - width / 2))}px`;
     sleepPair.style.top = `${Math.max(4, Math.min(innerHeight - height - 62, Math.min(pets[0].y, pets[1].y) - s * .25))}px`;
+    if (!wasPaired && transition && !reduced.matches && !saved.hidden) {
+      sleepAnimation = sleepPair.animate([
+        { opacity: 0, transform: 'translateY(7px) scale(.94)' },
+        { opacity: 1, transform: 'translateY(0) scale(1)' }
+      ], { duration: 720, easing: 'cubic-bezier(.22,.61,.36,1)' });
+    }
   }
-  function setSleeping(value) {
+  function setSleeping(value, transition = true) {
+    const waking = sleeping() && !value && transition;
     saved.sleeping[saved.mode] = value;
-    pets.forEach(p => { p.goal = null; pose(p, value ? 'sleep' : 'idle'); });
+    pets.forEach(p => {
+      p.goal = null;
+      if (!value) p.gestureAnimation?.cancel();
+      pose(p, value ? 'sleep' : (waking && !reduced.matches ? 'waking' : 'idle'));
+    });
     sleepButton.textContent = value ? '唤醒' : '休息';
     sleepButton.setAttribute('aria-pressed', String(value));
-    updateSleepPair();
+    updateSleepPair(transition);
+    stage.dataset.phase = value ? 'sleeping' : (waking && !reduced.matches ? 'waking' : 'idle');
+    if (waking && !reduced.matches) {
+      const current = gesture;
+      cuddleTimer = setTimeout(() => {
+        if (gesture !== current) return;
+        pets.forEach(p => { if (p.action === 'waking') pose(p, 'idle'); });
+        if (stage.dataset.phase === 'waking') stage.dataset.phase = 'idle';
+      }, 700);
+    }
     persist();
   }
   function showPairHeart() {
+    pairHeart.getAnimations().forEach(animation => animation.cancel());
     const s = size();
     pairHeart.style.left = `${(pets[0].x + pets[1].x) / 2 + s / 2 - 22}px`;
     pairHeart.style.top = `${Math.max(8, Math.min(pets[0].y, pets[1].y) - 22)}px`;
     pairHeart.hidden = false;
+    if (!reduced.matches) pairHeart.animate([
+      { opacity: 0, transform: 'translateY(7px) scale(.6)' },
+      { opacity: .9, transform: 'translateY(0) scale(1)', offset: .22 },
+      { opacity: .8, transform: 'translateY(-7px) scale(1.04)', offset: .65 },
+      { opacity: 0, transform: 'translateY(-20px) scale(.9)' }
+    ], { duration: 2450, easing: 'ease-in-out', fill: 'both' });
   }
   function finishMeeting() {
     const reason = meeting;
     meeting = null;
     if (reason === 'sleep') {
-      setSleeping(true);
-      say('小白靠着小黄，睡个好觉。');
+      const settle = () => { setSleeping(true); say('小白靠着小黄，睡个好觉。'); remember(); };
+      if (reduced.matches) settle();
+      else {
+        stage.dataset.phase = 'settling';
+        pets.forEach((p, index) => {
+          pose(p, 'settle');
+          p.gestureAnimation = p.el.querySelector('.companion-gesture').animate([
+            { transform: 'translateY(0) scale(1) rotate(0)' },
+            { transform: `translateY(7px) scale(.96) rotate(${index ? -3 : 3}deg)` }
+          ], { duration: 460, easing: 'ease-in-out', fill: 'forwards' });
+        });
+        const current = gesture;
+        cuddleTimer = setTimeout(() => { if (gesture === current) settle(); }, 460);
+      }
+    } else if (reason === 'release') {
+      stage.dataset.phase = 'idle';
     } else if (reason) {
+      stage.dataset.phase = 'cuddling';
       pets.forEach(p => pose(p, 'cuddle'));
-      showPairHeart();
       say('找到你啦，贴贴！');
-      const currentSession = session;
+      const current = gesture;
+      if (!reduced.matches) pets.forEach((p, index) => {
+        const x = index ? -6 : 14, angle = index ? -3 : 6;
+        p.gestureAnimation = p.el.querySelector('.companion-gesture').animate([
+          { transform: 'translate(0,0) rotate(0)', offset: 0 },
+          { transform: `translate(${x}px,-2px) rotate(${angle}deg)`, offset: .2 },
+          { transform: `translate(${x + (index ? -2 : 3)}px,-1px) rotate(${angle + (index ? -1 : 1)}deg)`, offset: .34 },
+          { transform: `translate(${x}px,-2px) rotate(${angle}deg)`, offset: .47 },
+          { transform: `translate(${x + (index ? -1 : 2)}px,-1px) rotate(${angle}deg)`, offset: .61 },
+          { transform: `translate(${x}px,-2px) rotate(${angle}deg)`, offset: .75 },
+          { transform: 'translate(0,0) rotate(0)', offset: 1 }
+        ], { duration: 3300, easing: 'ease-in-out', fill: 'forwards' });
+      });
+      heartTimer = setTimeout(() => { if (gesture === current) showPairHeart(); }, reduced.matches ? 0 : 480);
       cuddleTimer = setTimeout(() => {
-        if (session !== currentSession) return;
+        if (gesture !== current) return;
         pairHeart.hidden = true;
-        pets.forEach(p => pose(p, sleeping() ? 'sleep' : 'idle'));
-      }, 2600);
+        pets.forEach(p => { p.gestureAnimation?.cancel(); pose(p, 'idle'); });
+        if (!reduced.matches) {
+          meeting = 'release'; stage.dataset.phase = 'separating';
+          moveTo(pets[0], pets[0].x - size() * .07, pets[0].y, 650, 'idle');
+          moveTo(pets[1], pets[1].x + size() * .07, pets[1].y, 650, 'idle');
+          startMotion();
+        } else stage.dataset.phase = 'idle';
+      }, reduced.matches ? 1500 : 3300);
     }
     remember();
   }
@@ -158,14 +243,13 @@
     let moving = false;
     pets.forEach(p => {
       if (!p.goal) return;
-      const dx = p.goal.x - p.x, dy = p.goal.y - p.y;
-      const distance = Math.hypot(dx, dy);
-      const step = (meeting ? 260 : 55) * dt;
-      if (distance <= Math.max(step, 1)) {
+      p.goal.elapsed += dt * 1000;
+      const progress = Math.min(1, p.goal.elapsed / p.goal.duration);
+      const eased = progress ** 3 * (progress * (progress * 6 - 15) + 10);
+      position(p, p.goal.startX + (p.goal.x - p.goal.startX) * eased, p.goal.startY + (p.goal.y - p.goal.startY) * eased);
+      if (progress === 1) {
         position(p, p.goal.x, p.goal.y); p.goal = null; pose(p, 'idle');
       } else {
-        position(p, p.x + dx / distance * step, p.y + dy / distance * step);
-        if (Math.abs(dx) > 1) face(p, dx > 0 ? 1 : -1);
         moving = true;
       }
     });
@@ -179,21 +263,29 @@
   function startMotion() {
     if (!frame && !saved.hidden && !document.hidden) { lastFrame = 0; frame = requestAnimationFrame(animate); }
   }
-  function moveTo(p, x, y) {
+  function moveTo(p, x, y, duration, action = 'walk') {
     const goal = clamp(x, y);
     if (reduced.matches) { position(p, goal.x, goal.y); p.goal = null; }
-    else { p.goal = goal; pose(p, 'walk'); }
+    else {
+      const distance = Math.hypot(goal.x - p.x, goal.y - p.y);
+      p.goal = { ...goal, startX: p.x, startY: p.y, elapsed: 0, duration: duration ?? Math.max(650, Math.min(4000, distance / (meeting ? 190 : 55) * 1000)) };
+      if (action === 'walk' && Math.abs(goal.x - p.x) > 12) face(p, goal.x > p.x ? 1 : -1);
+      pose(p, action);
+    }
   }
   function gather(reason = 'cuddle') {
     if (saved.mode !== 'dogs' || saved.hidden || drag) return;
     clearMeeting();
     setSleeping(false);
     meeting = reason;
+    stage.dataset.phase = 'approaching';
     const s = size();
     const center = Math.max(s * .9, Math.min(innerWidth - s * .9, (pets[0].x + pets[1].x) / 2 + s / 2));
     const y = (pets[0].y + pets[1].y) / 2;
-    moveTo(pets[0], center - s * .85, y);
-    moveTo(pets[1], center - s * .15, y);
+    const targets = [clamp(center - s * .85, y), clamp(center - s * .15, y)];
+    const distance = Math.max(...pets.map((p, i) => Math.hypot(p.x - targets[i].x, p.y - targets[i].y)));
+    const duration = Math.max(800, Math.min(3200, distance / 190 * 1000));
+    pets.forEach((p, i) => moveTo(p, targets[i].x, targets[i].y, duration));
     if (reduced.matches) { face(pets[0], 1); face(pets[1], -1); finishMeeting(); }
     else startMotion();
   }
@@ -261,7 +353,7 @@
       el.type = 'button';
       el.className = `companion-pet ${dogs ? (index ? 'is-golden' : 'is-white') : 'is-laffey'}`;
       el.setAttribute('aria-label', `${name}：点击互动，拖动移动，方向键调整位置`);
-      el.innerHTML = '<span class="companion-facing"><span class="companion-art"></span></span><span class="companion-zzz" aria-hidden="true">z z Z</span>';
+      el.innerHTML = '<span class="companion-gesture"><span class="companion-facing"><span class="companion-art"></span></span></span><span class="companion-zzz" aria-hidden="true">z z Z</span>';
       const art = el.querySelector('.companion-art');
       if (!dogs) art.style.backgroundImage = `url("${new URL('laffey.png', base).href}")`;
       stage.append(el);
@@ -276,7 +368,7 @@
     toggle.textContent = dogs ? '小狗伙伴 · 设置' : '拉菲 · 设置';
     restore.textContent = dogs ? '召唤小狗' : '召唤拉菲';
     ui.querySelector('[data-action="greet"]').textContent = dogs ? '贴贴' : '互动';
-    setSleeping(sleeping()); setHidden(saved.hidden);
+    setSleeping(sleeping(), false); setHidden(saved.hidden);
   }
   toggle.addEventListener('click', () => { menu.hidden = !menu.hidden; toggle.setAttribute('aria-expanded', String(!menu.hidden)); });
   restore.addEventListener('click', () => { setHidden(false); toggle.focus(); say(saved.mode === 'dogs' ? '小白和小金毛来陪你啦。' : '拉菲回来了。'); });
@@ -309,6 +401,11 @@
     updateSleepPair();
   });
   reduced.addEventListener('change', () => {
+    if (reduced.matches) {
+      pets.forEach(p => p.gestureAnimation?.cancel());
+      pairHeart.getAnimations().forEach(animation => animation.cancel());
+      updateSleepPair();
+    }
     if (reduced.matches) { cancelAnimationFrame(frame); frame = 0; pets.forEach(p => { if (p.goal) { position(p, p.goal.x, p.goal.y); p.goal = null; pose(p, 'idle'); } }); if (meeting) finishMeeting(); }
   });
   setInterval(() => {
