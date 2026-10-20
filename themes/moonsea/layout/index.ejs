@@ -1,7 +1,13 @@
-<section class="hero shell" aria-labelledby="hero-title">
+<section class="hero" aria-labelledby="hero-title">
+  <img class="hero-illustration" src="<%- url_for('images/picnic-day.png') %>" alt="蓝天下，两只小狗依偎在开满粉色郁金香的草地上，身边放着野餐篮" width="1672" height="941" fetchpriority="high">
   <div class="hero-copy">
     <p class="hero-signature" lang="en"><%= theme.hero_signature %></p>
-    <h1 id="hero-title"><%= theme.hero_title %></h1>
+    <h1 id="hero-title" class="visually-hidden"><%= config.title %></h1>
+    <div class="hero-clock" aria-label="当前时间">
+      <time class="clock-time">--:--:--</time>
+      <p class="clock-date">正在读取时间</p>
+      <noscript>开启 JavaScript 即可显示当前时间。</noscript>
+    </div>
     <p class="hero-description"><%= theme.hero_description %></p>
     <div class="hero-actions">
       <a class="button button-primary" href="#latest">开始阅读 <span aria-hidden="true">→</span></a>
@@ -9,10 +15,6 @@
     </div>
     <p class="hero-note">把喜欢的瞬间，慢慢写成故事。</p>
   </div>
-  <figure class="hero-postcard">
-    <img src="<%- url_for('images/rose-postcard.png') %>" alt="白玫瑰与暖灯围绕的海边窗台，远处是淡紫色暮海" width="800" height="1000" fetchpriority="high">
-    <figcaption><span>a quiet moment</span><span class="postcard-signature">Laffey</span></figcaption>
-  </figure>
 </section>
 
 <section class="latest shell" id="latest" aria-labelledby="latest-title">
@@ -25,7 +27,7 @@
     <% page.posts.each(function(post) { %>
       <article class="post-preview">
         <a class="post-preview-art" href="<%- url_for(post.path) %>" tabindex="-1" aria-hidden="true">
-          <img src="<%- url_for('images/rose-postcard.png') %>" alt="" width="800" height="1000" loading="lazy">
+          <img src="<%- url_for('images/picnic-day.png') %>" alt="" width="1672" height="941" loading="lazy">
         </a>
         <div class="post-preview-copy">
           <div class="post-meta"><time datetime="<%= date_xml(post.date) %>"><%= date(post.date, 'YYYY.MM.DD') %></time><% if (post.tags && post.tags.length) { %><span><%= post.tags.map(function(tag) { return tag.name; }).join(' · ') %></span><% } %></div>
