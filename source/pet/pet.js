@@ -136,7 +136,7 @@
     meeting = null;
     if (reason === 'sleep') {
       setSleeping(true);
-      say('小白枕着小黄，睡个好觉。');
+      say('小白靠着小黄，睡个好觉。');
     } else if (reason) {
       pets.forEach(p => pose(p, 'cuddle'));
       showPairHeart();

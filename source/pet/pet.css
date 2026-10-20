@@ -1,6 +1,6 @@
 .companion-stage { position: fixed; inset: 0; z-index: 2000; pointer-events: none; }
 .companion-stage[hidden], .companion-controls [hidden], .companion-pair-heart[hidden], .companion-sleep-pair[hidden] { display: none !important; }
-.companion-sleep-pair { position: absolute; background: url('dogs-sleep-pair.png') center / contain no-repeat; pointer-events: none; animation: companion-breathe 6s ease-in-out infinite; }
+.companion-sleep-pair { position: absolute; background: url('dogs-sleep-pair-v2.png') center / contain no-repeat; pointer-events: none; animation: companion-breathe 6s ease-in-out infinite; }
 .is-pair-sleep .companion-pet .companion-art { visibility: hidden; }
 .is-pair-sleep .is-white .companion-zzz { display: none; }
 .companion-pet { position: absolute; width: 136px; height: 136px; padding: 0; background: none; border: 0; cursor: grab; pointer-events: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
